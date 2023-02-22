@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Jeddit</title>
+  </head>
+  <body>
+    <h1>JEDDIT</h1>
+      <a href="login">Login</a>
+      <a href="/subs/list">Subs List</a>
+    <% posts.forEach(post => { %>
+    <div id="eachPost">
+      <h2><a href="/posts/show/<%= post.id %>"><%= post.title %></a></h2>
+      <p><a href="<%= post.link %>"><%= post.link %></a></p>
+      <p><a>posted by <%= post.creator.uname %></a></p>
+      <p><a><%= new Date(post.timestamp).toLocaleString() %></a></p>
+    </div>
+    <% }) %>
+    
+  </body>
+</html>
