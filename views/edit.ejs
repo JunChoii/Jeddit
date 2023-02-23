@@ -9,26 +9,30 @@
   </head>
   <body>
     <h1>JEDDIT</h1>
-    <h2>Create Post</h2>
-    <form action="/posts/create" method="POST">
+    <h2>edit Post</h2>
+    <form action="/posts/edit/<%= post.id %>" method="POST">
       <label for="titleInput">Title</label>
-      <input type="text" id="titleInput" name="title" />
+      <input
+        value="<%= post.title %>"
+        type="text"
+        id="titleInput"
+        name="title"
+      />
 
       <label for="subgroupInput">Subgroup</label>
-      <input type="text" id="subgroupInput" name="subgroup" />
-
-      <label for="CreatorInput">Creator</label>
-      <input type="text" id="CreatorInput" name="creator" />
+      <input
+        value="<%= post.subgroup %>"
+        type="text"
+        id="subgroupInput"
+        name="subgroup"
+      />
 
       <label for="descriptionInput" required>Description</label>
-      <textarea
-        name="description"
-        id="descriptionInput"
-        cols="30"
-        rows="10"
-      ></textarea>
+      <textarea name="description" id="descriptionInput" cols="30" rows="10">
+<%= post.description %></textarea
+      >
 
-      <button type="submit">Create Post</button>
+      <button type="submit">Edit Post</button>
     </form>
   </body>
 </html>

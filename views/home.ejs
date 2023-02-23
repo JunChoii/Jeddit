@@ -6,11 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <title>Jeddit</title>
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body>
+   
     <h1>JEDDIT</h1>
-      <a href="login">Login</a>
-      <a href="/subs/list">Subs List</a>
+    <a href="<%= user ? "/logout": "/login" %>"><%= user ? "logout" : "login" %></a>
+    <% if (user) { %>
+      <p>Welcome <%= user.uname %></p>
+    <% } %>
+    <a href="/subs/list">Subs List</a>
     <% posts.forEach(post => { %>
     <div id="eachPost">
       <h2><a href="/posts/show/<%= post.id %>"><%= post.title %></a></h2>
@@ -19,6 +24,8 @@
       <p><a><%= new Date(post.timestamp).toLocaleString() %></a></p>
     </div>
     <% }) %>
-    
+    <form action="/posts/create">
+      <button type="submit">Create Post</button>
+    </form>
   </body>
 </html>

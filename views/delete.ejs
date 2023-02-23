@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Jeddit</title>
+  </head>
+  <body>
+    <p>Are you sure you want to delete?</p>
+    <form method="post" action="/posts/delete/<%= postid %>">
+      <button>Delete</button>
+    </form>
+    <form action="/posts/show/<%= postid %>">
+      <button>Cancel</button>
+    </form>
+  </body>
+</html>

@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const app = express();
+app.use(express.static("public"));
 const db = require("./fake-db");
 const PORT = 8000;
 
@@ -25,15 +26,25 @@ app.get("/debug", (req, res) => {
 });
 ///////////////////////auth////////////////////
 app.get("/login", (req, res) => {
-  res.send("getlogin");
+  res.render("login");
 });
 
 app.post("/login", (req, res) => {
-  res.send("postlogin");
+  const username = req.body.username;
+  const password = req.body.password;
+  const user = db.getUserByUsername(username);
+  if (user) {
+    if (user.password === password) {
+      req.session.user = user;
+      res.redirect("/");
+    }
+  }
+  res.redirect("/login");
 });
 
-app.post("/logout", (req, res) => {
-  res.send(`postlout`);
+app.get("/logout", (req, res) => {
+  req.session.user = null;
+  res.redirect("/login");
 });
 ///////////////////////auth////////////////////
 
@@ -48,7 +59,7 @@ app.get("/", (req, res) => {
     ...post,
     creator: db.getUser(post.creator),
   }));
-  res.render("home", { posts: decoratePost });
+  res.render("home", { posts: decoratePost, user: req.session.user });
 });
 
 app.get("/subs/list", (req, res) => {
@@ -70,6 +81,7 @@ app.get("/subs/show/:subname", (req, res) => {
 });
 
 app.get("/posts/show/:postid", (req, res) => {
+  // DONE
   // shows post title, post link, timestamp, and creator
   // also has a list of all comments related to this post
   // each of these should show the comment description, creator, and timestamp
@@ -77,7 +89,8 @@ app.get("/posts/show/:postid", (req, res) => {
   // if you're logged in, a form for commenting should show
   // const postInfo = db.getPosts().find((post)=>req.params.id === post.id)
   // console.log(postInfo);
-  res.render("postsShow");
+  const post = db.getPost(req.params.postid);
+  res.render("postShow", { post });
 });
 
 app.get("/posts/create", (req, res) => {
@@ -87,6 +100,7 @@ app.get("/posts/create", (req, res) => {
 });
 
 app.post("/posts/create", (req, res) => {
+  // DONE
   // processes the creation
   // doesn't allow obviously-silly creations, for example if there's no link and also no description
   // (no-link is okay if you want to do that, though)
@@ -94,33 +108,38 @@ app.post("/posts/create", (req, res) => {
   // so if the sub already exists, connect this post to that sub
   // but if the sub doesn't already exist, make a new sub!
   // when finished redirects to the post just created
-  const createPost = req.body;
-  const createdPost = db.addPost(createPost);
-  res.render(`/posts/create/${createdPost.id}`);
-  //ERROR: Failed to lookup view /post/create/103?? why 103????
+  const { title, subgroup, creator, description } = req.body;
+  db.addPost(title, "", creator, description, subgroup);
+  res.redirect("/");
+  // main page is broken somewhere dealing with uname. It doesn't send enough keys from postsCreate.ejs to the main page when it is trying to redirect the users. GET IT WORKED JUN!!!!!!!!!!!!!
 });
 
 app.get("/posts/edit/:postid", (req, res) => {
+  // DONE
   // `form for editing an existing post
   // please think for a moment about which parts of a post should be editable, and which should not
   // obviously shouldn't load unless you're logged in as the correct user`
-  res.render();
+  const post = db.getPost(req.params.postid);
+  res.render("edit", { post });
 });
 
 app.post("/posts/edit/:postid", (req, res) => {
-  res.send(`obvious, right?
-  redirect back to the post when done`);
+  // DONE
+  db.editPost(req.params.postid, req.body);
+  res.redirect(`/posts/show/${req.params.postid}`);
 });
 
 app.get("/posts/deleteconfirm/:postid", (req, res) => {
-  res.send(`form for confirming delete of an existing post
-  obviously shouldn't load unless you're logged in as the correct user`);
+  res.render("delete", { postid: req.params.postid });
+  // DONE
+  //form for confirming delete of an existing post
+  // obviously shouldn't load unless you're logged in as the correct user
 });
 
 app.post("/posts/delete/:postid", (req, res) => {
-  res.send(`obvious, right?
-  if cancelled, redirect back to the post
-  if successful, redirect back to the sub that the post belonged to`);
+  // DONE
+  db.deletePost(req.params.postid);
+  res.redirect("/");
 });
 
 app.post("/posts/comment-create/:postid", (req, res) => {
@@ -144,8 +163,6 @@ app.get("/comments/deleteconfirm/:commentid", (req, res) => {
 app.post("/comments/delete/:commentid", (req, res) => {
   res.send(`obvious, right?`);
 });
-
-app.use(express.static("views"));
 
 app.listen(PORT, () =>
   console.log(`server should be running at http://localhost:${PORT}/`)
